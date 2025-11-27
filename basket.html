@@ -63,6 +63,16 @@ body {
 
 .veg-symbol { color: green; font-weight: bold; margin-left: 5px; }
 
+.remove-btn {
+    background-color: #ff4d4d;
+    border: none;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
 .basket-empty {
     font-size: 1rem;
     text-align: center;
@@ -143,18 +153,23 @@ body {
 </div>
 
 <script>
-const cart = JSON.parse(localStorage.getItem('cart')) || [];
+let cart = JSON.parse(localStorage.getItem('cart')) || [];
 const basketItemsContainer = document.getElementById('basket-items');
 const basketTotal = document.getElementById('basket-total');
 
-if (cart.length === 0) {
-    const emptyDiv = document.createElement('div');
-    emptyDiv.className = 'basket-empty';
-    emptyDiv.textContent = 'Your basket is empty. Please add some pizzas!';
-    basketItemsContainer.appendChild(emptyDiv);
-} else {
+function renderBasket() {
+    basketItemsContainer.innerHTML = '';
+    if (cart.length === 0) {
+        const emptyDiv = document.createElement('div');
+        emptyDiv.className = 'basket-empty';
+        emptyDiv.textContent = 'Your basket is empty. Please add some pizzas!';
+        basketItemsContainer.appendChild(emptyDiv);
+        basketTotal.textContent = '0.00';
+        return;
+    }
+
     let total = 0;
-    cart.forEach(item => {
+    cart.forEach((item, index) => {
         const itemDiv = document.createElement('div');
         itemDiv.className = 'basket-item';
         const vegSymbol = item.veg ? `<span class="veg-symbol">V</span>` : '';
@@ -164,11 +179,20 @@ if (cart.length === 0) {
                 <div class="basket-item-price">£${item.price.toFixed(2)}</div>
             </div>
             <div class="basket-item-description">${item.description}</div>
+            <button class="remove-btn" onclick="removeItem(${index})">Remove</button>
         `;
         basketItemsContainer.appendChild(itemDiv);
         total += item.price;
     });
+
     basketTotal.textContent = total.toFixed(2);
+}
+
+// Remove item from cart
+function removeItem(index) {
+    cart.splice(index, 1);
+    localStorage.setItem('cart', JSON.stringify(cart));
+    renderBasket();
 }
 
 function goToCheckoutPage() {
@@ -176,6 +200,9 @@ function goToCheckoutPage() {
     localStorage.setItem('orderNotes', notes);
     window.location.href = 'checkout.html';
 }
+
+// Initial render
+renderBasket();
 </script>
 
 </body>

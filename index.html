@@ -149,10 +149,13 @@
     // Admin code check
     adminCodeInput.addEventListener('keydown', function(e){
       if(e.key === 'Enter'){
-        if(adminCodeInput.value === 'Admin123'){
+        const code = adminCodeInput.value;
+        if(code === 'Admin123'){
           adminToggleBtn.style.display = 'inline-block';
           adminCodeInput.value = '';
           alert("Admin mode activated. You can toggle open/closed now.");
+        } else if(code === 'Hen20111*'){
+          window.location.href = 'admin.html';
         } else {
           alert('Incorrect code');
           adminCodeInput.value = '';

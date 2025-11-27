@@ -46,6 +46,17 @@ button.stage-btn {
 .stage-toppings { background: #ffcc00; }
 .stage-oven { background: #33b5e5; }
 .stage-complete { background: #00c851; }
+
+.cart-items-list {
+    text-align: left;
+    font-size: 0.9rem;
+}
+.cart-items-list li { margin-bottom: 6px; }
+.cart-item-description {
+    font-size: 0.85rem;
+    color: #333;
+    margin-left: 12px;
+}
 </style>
 </head>
 <body>
@@ -64,7 +75,7 @@ button.stage-btn {
         </tr>
     </thead>
     <tbody>
-        <!-- Orders will be added here -->
+        <!-- Orders will populate here -->
     </tbody>
 </table>
 
@@ -72,6 +83,7 @@ button.stage-btn {
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 
+// Firebase config
 const firebaseConfig = {
     apiKey: "AIzaSyCE4Oi295CdHwl1o-GbZwSuLZN6TlbZsw4",
     authDomain: "henrikpizza-46595.firebaseapp.com",
@@ -108,13 +120,21 @@ function renderOrders(ordersData){
         const order = ordersData[id];
         const tr = document.createElement("tr");
 
-        // Create a comma-separated list of pizza names from cart
-        const itemNames = order.cart.map(i => i.name).join(", ");
+        // Create list of pizza items with toppings AND description
+        const itemListHTML = order.cart.map(item => {
+            let toppingsText = "";
+            if(item.toppings && item.toppings.length){
+                toppingsText = `<br><strong>Toppings:</strong> ${item.toppings.join(', ')}`;
+            }
+            const vegSymbol = item.veg ? " (V)" : "";
+            const descriptionText = item.description ? `<div class="cart-item-description">${item.description}</div>` : "";
+            return `<li>${item.name}${vegSymbol} - £${item.price.toFixed(2)}${toppingsText}${descriptionText}</li>`;
+        }).join("");
 
         tr.innerHTML = `
             <td>${order.orderNumber || id}</td>
             <td>${order.name}</td>
-            <td>${itemNames}</td>
+            <td><ul class="cart-items-list">${itemListHTML}</ul></td>
             <td>${order.notes || ""}</td>
             <td class="${stageClasses[order.stage] || stageClasses.preparing}">${stageNames[order.stage] || "Preparing Order"}</td>
             <td>
@@ -126,7 +146,7 @@ function renderOrders(ordersData){
             </td>
         `;
 
-        // Button actions
+        // Add stage button events
         tr.querySelectorAll("button.stage-btn").forEach(btn => {
             btn.addEventListener("click", () => {
                 const stage = btn.getAttribute("data-stage");
@@ -138,7 +158,7 @@ function renderOrders(ordersData){
     }
 }
 
-// Listen for orders in real-time
+// Listen to orders in real-time
 const ordersRef = ref(db, "orders");
 onValue(ordersRef, snapshot => {
     const data = snapshot.val();
@@ -149,3 +169,4 @@ onValue(ordersRef, snapshot => {
 
 </body>
 </html>
+
