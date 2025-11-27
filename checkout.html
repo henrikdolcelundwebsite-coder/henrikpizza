@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout - Henrik's Firewood Pizza</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    background-color: #fef5e6;
+    color: #242424;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+header { width: 100%; display: flex; justify-content: center; margin-bottom: 20px; }
+header h1 { font-family: 'Cinzel', serif; font-size: 2rem; }
+
+.cart-summary, .checkout-form {
+    width: 90%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+    align-items: center;
+}
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    background-color: #ffffff;
+    padding: 10px 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+.cart-item-name { font-weight: bold; }
+.cart-item-price { font-weight: bold; }
+
+label { font-weight: bold; margin-top: 10px; }
+input, textarea, select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-family: Arial, sans-serif;
+}
+button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-top: 20px;
+}
+button:hover { background-color: #45a049; }
+
+.total-box {
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-top: 10px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+#paypal-button-container {
+    margin-top: 20px;
+    width: 100%;
+    max-width: 400px;
+}
+</style>
+</head>
+<body>
+
+<header><h1>Checkout</h1></header>
+
+<div class="cart-summary" id="cartSummary"></div>
+
+<div class="total-box">
+    <span>Total:</span>
+    <span>£<span id="totalPrice">0.00</span></span>
+</div>
+
+<form class="checkout-form" id="checkoutForm">
+    <label for="customerName">Name:</label>
+    <input type="text" id="customerName" required>
+
+    <label>Order Type:</label>
+    <select id="orderType" required>
+        <option value="">--Select--</option>
+        <option value="pickup">Pickup</option>
+        <option value="delivery">Delivery</option>
+    </select>
+
+    <div id="deliveryAddressContainer" style="display:none;">
+        <label for="deliveryAddress">Delivery Address:</label>
+        <input type="text" id="deliveryAddress" placeholder="Only Sandy Lane allowed">
+    </div>
+
+    <div id="pickupTimeContainer" style="display:none;">
+        <label for="pickupTime">Pickup Time:</label>
+        <input type="time" id="pickupTime">
+    </div>
+
+    <label for="extraNotes">Extra Notes:</label>
+    <textarea id="extraNotes" rows="3" placeholder="E.g., no olives, extra cheese"></textarea>
+</form>
+
+<div id="paypal-button-container"></div>
+
+<script type="module">
+// Firebase imports
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+// Firebase config
+const firebaseConfig = {
+    apiKey: "AIzaSyCE4Oi295CdHwl1o-GbZwSuLZN6TlbZsw4",
+    authDomain: "henrikpizza-46595.firebaseapp.com",
+    databaseURL: "https://henrikpizza-46595-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "henrikpizza-46595",
+    storageBucket: "henrikpizza-46595.firebasestorage.app",
+    messagingSenderId: "590622406769",
+    appId: "1:590622406769:web:8a0a196ba5820eedb683d0"
+};
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+// Load cart and calculate total
+const cart = JSON.parse(localStorage.getItem('cart')) || [];
+const cartSummary = document.getElementById('cartSummary');
+const totalPriceEl = document.getElementById('totalPrice');
+let total = 0;
+
+cart.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'cart-item';
+    div.innerHTML = `
+        <span class="cart-item-name">${item.name}${item.veg ? ' <span style="color:green;font-weight:bold;">V</span>' : ''}</span>
+        <span class="cart-item-price">£${item.price.toFixed(2)}</span>`;
+    cartSummary.appendChild(div);
+    total += item.price;
+});
+totalPriceEl.textContent = total.toFixed(2);
+
+// Populate extra notes
+document.getElementById('extraNotes').value = localStorage.getItem('orderNotes') || '';
+
+// Show/hide delivery vs pickup
+const orderTypeEl = document.getElementById('orderType');
+const deliveryContainer = document.getElementById('deliveryAddressContainer');
+const pickupContainer = document.getElementById('pickupTimeContainer');
+
+orderTypeEl.addEventListener('change', () => {
+    if(orderTypeEl.value==='delivery'){
+        deliveryContainer.style.display='block';
+        deliveryContainer.querySelector('input').disabled=false;
+        pickupContainer.style.display='none';
+    } else if(orderTypeEl.value==='pickup'){
+        deliveryContainer.style.display='none';
+        deliveryContainer.querySelector('input').disabled=true;
+        pickupContainer.style.display='block';
+    } else {
+        deliveryContainer.style.display='none';
+        deliveryContainer.querySelector('input').disabled=true;
+        pickupContainer.style.display='none';
+    }
+});
+
+// Load PayPal SDK
+const paypalScript = document.createElement('script');
+paypalScript.src = "https://www.paypal.com/sdk/js?client-id=AVkR6JKm_UgM3e86DIQkbiY8xtBKusiBoKCrwJRpl1plGzPF0hvXGci_pBgPbLKu55dVHPdomjNcCcXI&currency=GBP";
+paypalScript.onload = setupPayPal;
+document.body.appendChild(paypalScript);
+
+function setupPayPal() {
+    paypal.Buttons({
+        style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'pay' },
+        createOrder: (data, actions) => {
+            if(cart.length === 0) { alert("Cart is empty!"); return; }
+            const orderType = orderTypeEl.value;
+            const deliveryAddress = document.getElementById('deliveryAddress').value.trim();
+            if(orderType==='delivery' && !deliveryAddress.includes('Sandy Lane')){
+                alert("We only deliver to Sandy Lane."); return;
+            }
+            return actions.order.create({
+                purchase_units: [{ amount: { value: total.toFixed(2) } }]
+            });
+        },
+        onApprove: async (data, actions) => {
+            const details = await actions.order.capture();
+            const name = document.getElementById('customerName').value.trim();
+            const orderType = orderTypeEl.value;
+            const deliveryAddress = document.getElementById('deliveryAddress').value.trim();
+            const pickupTime = document.getElementById('pickupTime').value;
+            const extraNotes = document.getElementById('extraNotes').value.trim();
+
+            const lastOrderRef = ref(db, 'lastOrderNumber');
+            const snapshot = await get(lastOrderRef);
+            let orderNumber = snapshot.exists() ? snapshot.val() + 1 : 1;
+            const orderKey = orderNumber.toString().padStart(4,'0');
+            const formattedOrderNumber = '#' + orderKey;
+
+            const orderData = {
+                orderNumber: formattedOrderNumber,
+                name,
+                type: orderType,
+                address: orderType==='delivery'?deliveryAddress:null,
+                pickupTime: orderType==='pickup'?pickupTime:null,
+                cart,
+                notes: extraNotes,
+                total,
+                status: "pending",
+                timestamp: Date.now()
+            };
+
+            await set(ref(db, 'orders/' + orderKey), orderData);
+            await set(lastOrderRef, orderNumber);
+
+            localStorage.removeItem('cart');
+            localStorage.removeItem('orderNotes');
+
+            alert(`Order placed! Your order number is ${formattedOrderNumber}`);
+            window.location.href = 'track.html';
+        },
+        onError: (err) => { console.error(err); alert("PayPal payment error."); }
+    }).render('#paypal-button-container');
+}
+</script>
+
+</body>
+</html>

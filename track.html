@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Track Your Pizza | Henrik's Firewood Pizza</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
-<link rel="icon" href="assets/favicon.png" type="image/png">
 <style>
 body {
     margin: 0;
@@ -19,20 +18,16 @@ body {
 }
 
 h1 { font-size: 2.5rem; margin-bottom: 10px; text-align: center; }
-h2 { margin: 10px 0 20px 0; font-size: 1.8rem; }
+h2 { margin: 10px 0 20px 0; font-size: 1.8rem; text-align: center; }
 
-#chartContainer {
-    width: 300px;
-    height: 300px;
-    margin-top: 20px;
-}
+#chartContainer { width: 300px; height: 300px; margin-top: 20px; }
 
 #completeMessage {
     font-size: 1.2rem;
     margin-top: 15px;
     display: none;
     text-align: center;
-    color: rgb(36,36,36); /* normal text color */
+    color: rgb(36,36,36);
 }
 
 #backHome {
@@ -59,11 +54,7 @@ h2 { margin: 10px 0 20px 0; font-size: 1.8rem; }
     width: 100%;
 }
 
-.review-container h3 {
-    text-align: center;
-    margin-bottom: 15px;
-    font-size: 1.5rem;
-}
+.review-container h3 { text-align: center; margin-bottom: 15px; font-size: 1.5rem; }
 
 .star-rating {
     display: flex;
@@ -79,9 +70,7 @@ h2 { margin: 10px 0 20px 0; font-size: 1.8rem; }
     transition: color 0.2s;
 }
 
-.star.selected, .star:hover, .star:hover ~ .star {
-    color: #ffb400;
-}
+.star.selected, .star:hover, .star:hover ~ .star { color: #ffb400; }
 
 .review-container textarea {
     width: 100%;
@@ -108,9 +97,7 @@ h2 { margin: 10px 0 20px 0; font-size: 1.8rem; }
     transition: background 0.3s;
 }
 
-.review-container button:hover {
-    background: #555;
-}
+.review-container button:hover { background: #555; }
 
 @media (max-width: 500px) {
     #chartContainer { width: 250px; height: 250px; }
@@ -125,7 +112,7 @@ h2 { margin: 10px 0 20px 0; font-size: 1.8rem; }
 <body>
 
 <h1>Track Your Pizza</h1>
-<h2 id="orderNameDisplay">Order Name: N/A</h2>
+<h2 id="orderNameDisplay">Order #: N/A</h2>
 
 <div id="chartContainer">
     <canvas id="progressChart"></canvas>
@@ -169,13 +156,15 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const firestore = getFirestore(app);
 
+// Get orderNumber from URL
 const params = new URLSearchParams(window.location.search);
-const orderName = params.get("name");
-document.getElementById("orderNameDisplay").textContent = orderName ? `Order Name: "${decodeURIComponent(orderName)}"` : "Order Name: N/A";
+const orderNumber = params.get("order") || "";
+document.getElementById("orderNameDisplay").textContent = orderNumber ? `Order #: ${decodeURIComponent(orderNumber)}` : "Order #: N/A";
 
 const stages = ["preparing", "dough", "toppings", "oven", "complete"];
 const stageLabels = ["Preparing Order","Stretching Dough","Adding Toppings","In the Oven","Complete"];
 
+// Chart setup
 const ctx = document.getElementById('progressChart').getContext('2d');
 const chartData = {
     labels: stageLabels,
@@ -194,6 +183,7 @@ const progressChart = new Chart(ctx, {
 const completeMessage = document.getElementById("completeMessage");
 const reviewContainer = document.getElementById("reviewContainer");
 
+// Star selection
 let selectedStars = 0;
 document.querySelectorAll(".star").forEach(star => {
     star.addEventListener("click", () => {
@@ -204,12 +194,13 @@ document.querySelectorAll(".star").forEach(star => {
     });
 });
 
+// Submit review
 document.getElementById("submitReview").addEventListener("click", async () => {
     const text = document.getElementById("reviewText").value.trim();
     if(selectedStars === 0 || text === "") return alert("Please select stars and write a review.");
     try {
         await addDoc(collection(firestore, "reviews"), {
-            name: decodeURIComponent(orderName),
+            name: orderNumber,
             stars: selectedStars,
             review: text,
             timestamp: new Date().toISOString(),
@@ -222,31 +213,31 @@ document.getElementById("submitReview").addEventListener("click", async () => {
     }
 });
 
-const ordersRef = ref(db, "orders");
-const orderQuery = query(ordersRef, orderByChild("name"), equalTo(decodeURIComponent(orderName)));
+// Track order
+if(orderNumber){
+    const ordersRef = ref(db, "orders/" + orderNumber.replace("#",""));
+    onValue(ordersRef, snapshot => {
+        const order = snapshot.val();
+        if(!order) return;
 
-onValue(orderQuery, snapshot => {
-    const data = snapshot.val();
-    if(!data) return;
-    const lastOrderKey = Object.keys(data).pop();
-    const order = data[lastOrderKey];
-    const currentStage = order.stage || "preparing";
+        const currentStage = order.stage || "preparing";
+        const stageIndex = stages.indexOf(currentStage);
 
-    const stageIndex = stages.indexOf(currentStage);
-    chartData.datasets[0].backgroundColor = stages.map((s, i) => i <= stageIndex ? '#00c851' : '#ff4d4d');
-    progressChart.update();
+        chartData.datasets[0].backgroundColor = stages.map((s,i) => i <= stageIndex ? '#00c851' : '#ff4d4d');
+        progressChart.update();
 
-    if(currentStage === "complete"){
-        confetti({
-            particleCount: 150,
-            spread: 100,
-            startVelocity: 50,
-            colors: ['#ff3838','#ffb400','#00c851','#33b5e5','#f368e0','#feca57']
-        });
-        completeMessage.style.display = "block";
-        reviewContainer.style.display = "block";
-    }
-});
+        if(currentStage === "complete"){
+            confetti({
+                particleCount: 150,
+                spread: 100,
+                startVelocity: 50,
+                colors: ['#ff3838','#ffb400','#00c851','#33b5e5','#f368e0','#feca57']
+            });
+            completeMessage.style.display = "block";
+            reviewContainer.style.display = "block";
+        }
+    });
+}
 </script>
 
 </body>

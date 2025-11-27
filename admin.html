@@ -55,8 +55,9 @@ button.stage-btn {
 <table id="ordersTable">
     <thead>
         <tr>
+            <th>Order #</th>
             <th>Name</th>
-            <th>Toppings</th>
+            <th>Items</th>
             <th>Notes</th>
             <th>Stage</th>
             <th>Actions</th>
@@ -69,7 +70,7 @@ button.stage-btn {
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-import { getDatabase, ref, onValue, update, remove } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyCE4Oi295CdHwl1o-GbZwSuLZN6TlbZsw4",
@@ -107,9 +108,13 @@ function renderOrders(ordersData){
         const order = ordersData[id];
         const tr = document.createElement("tr");
 
+        // Create a comma-separated list of pizza names from cart
+        const itemNames = order.cart.map(i => i.name).join(", ");
+
         tr.innerHTML = `
+            <td>${order.orderNumber || id}</td>
             <td>${order.name}</td>
-            <td>${order.toppings.join(", ")}</td>
+            <td>${itemNames}</td>
             <td>${order.notes || ""}</td>
             <td class="${stageClasses[order.stage] || stageClasses.preparing}">${stageNames[order.stage] || "Preparing Order"}</td>
             <td>
@@ -138,7 +143,7 @@ const ordersRef = ref(db, "orders");
 onValue(ordersRef, snapshot => {
     const data = snapshot.val();
     if(data) renderOrders(data);
-    else ordersTableBody.innerHTML = "<tr><td colspan='5'>No orders yet.</td></tr>";
+    else ordersTableBody.innerHTML = "<tr><td colspan='6'>No orders yet.</td></tr>";
 });
 </script>
 

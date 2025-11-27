@@ -1,151 +1,176 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Henrik's Firewood Pizza</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
-<link rel="icon" href="assets/favicon.png" type="image/png">
-<style>
-body {
-    margin: 0;
-    height: 100vh;
-    font-family: 'Cinzel', serif;
-    background: #fef5e6;
-    overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    flex-direction: column;
-}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Henrik's Firewood Pizza</title>
 
-/* Centered Title + Buttons */
-.main-center {
-    z-index: 10;
-    text-align: center;
-}
+  <!-- Google Font: Cinzel -->
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
 
-h1 {
-    color: rgb(36,36,36);
-    font-size: 3rem;
-    margin-bottom: 10px;
-}
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Arial', sans-serif;
+      background: #fef5e6;
+      color: #4a3b2a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      position: relative;
+    }
 
-/* Est. text */
-.est {
-    font-size: 1rem;
-    color: rgb(36,36,36);
-    margin-bottom: 20px;
-}
+    h1 { font-family: 'Cinzel', serif; color: rgb(36,36,36); font-size: 3rem; margin-bottom: 10px; text-align: center; }
+    .est { font-size: 1rem; color: rgb(36,36,36); margin-bottom: 20px; text-align: center; }
 
-/* Buttons */
-.button-container {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    flex-wrap: wrap;
-}
+    .button-container { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-bottom: 15px; }
+    .button-container a {
+      text-decoration: none;
+      padding: 15px 30px;
+      background: rgb(36,36,36);
+      color: white;
+      font-size: 1.2rem;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      font-family: 'Arial', sans-serif;
+    }
+    .button-container a:hover { background: #555; transform: scale(1.05); }
 
-.button-container a {
-    text-decoration: none;
-    padding: 15px 30px;
-    background: rgb(36,36,36);
-    color: white;
-    font-size: 1.2rem;
-    border-radius: 12px;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
+    .info-text { font-size: 1rem; color: rgb(36,36,36); text-align: center; }
 
-.button-container a:hover {
-    background: #555;
-    transform: scale(1.05);
-}
+    .numbers-container {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 25px;
+      margin: 25px 0;
+      position: relative;
+    }
+    .numbers-container img { width: 100px; height: auto; transition: transform 0.3s; position: relative; }
+    .numbers-container img:nth-child(1) { top: 0px; }
+    .numbers-container img:nth-child(2) { top: 15px; }
+    .numbers-container img:nth-child(3) { top: -10px; }
+    .numbers-container img:nth-child(4) { top: 20px; }
+    .numbers-container img:nth-child(5) { top: -15px; }
+    .numbers-container img:hover { transform: scale(1.2); }
 
-/* Info text under buttons */
-.info-text {
-    margin-top: 15px;
-    font-size: 1rem;
-    color: rgb(36,36,36);
-}
+    #adminCode { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); padding: 4px 8px; font-size: 0.7rem; border-radius: 6px; border: 1px solid rgba(36,36,36,0.4); opacity: 0.25; transition: 0.3s; font-family: 'Arial', sans-serif; }
+    #adminCode:focus { opacity: 1; border: 2px solid rgb(36,36,36); font-size: 1rem; padding: 8px 12px; }
 
-/* Pizza images */
-.pizza {
-    position: absolute;
-    width: 150px;
-    height: 150px;
-    border: 4px solid rgb(36,36,36);
-    border-radius: 50%;
-    animation: floatRotate 12s ease-in-out infinite;
-    opacity: 0.85;
-}
+    #adminToggle { display: none; margin-top: 15px; padding: 10px 20px; border-radius: 8px; border: none; background: #c9a46b; color: white; font-weight: bold; cursor: pointer; }
+    #adminToggle:hover { background: #7d5f3b; }
 
-@keyframes floatRotate {
-    0% { transform: translate(0, 0) rotate(0deg); }
-    25% { transform: translate(80px, -40px) rotate(90deg); }
-    50% { transform: translate(-60px, 60px) rotate(180deg); }
-    75% { transform: translate(40px, -80px) rotate(270deg); }
-    100% { transform: translate(0, 0) rotate(360deg); }
-}
+    @media (max-width: 900px) {
+      .numbers-container img { width: 80px; }
+      .numbers-container img:nth-child(2) { top: 10px; }
+      .numbers-container img:nth-child(3) { top: -8px; }
+      .numbers-container img:nth-child(4) { top: 12px; }
+      .numbers-container img:nth-child(5) { top: -10px; }
+    }
 
-/* Responsive */
-@media (max-width: 600px) {
-    h1 { font-size: 2rem; margin-bottom: 5px; }
-    .pizza { width: 120px; height: 120px; border-width: 3px; }
-    .button-container a { font-size: 1rem; padding: 12px 25px; }
-    .est, .info-text { font-size: 0.9rem; }
-}
-
-/* Admin code input at bottom, slightly raised for mobile */
-#adminCode {
-    position: fixed;
-    bottom: 40px; /* moved up from 10px */
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 8px 12px;
-    font-size: 1rem;
-    border-radius: 6px;
-    border: 2px solid rgb(36,36,36);
-}
-</style>
+    @media (max-width: 600px) {
+      h1 { font-size: 2rem; margin-bottom: 5px; }
+      .button-container a { font-size: 1rem; padding: 12px 25px; }
+      .est, .info-text { font-size: 0.9rem; }
+      .numbers-container img { width: 60px; }
+      .numbers-container img:nth-child(2) { top: 5px; }
+      .numbers-container img:nth-child(3) { top: -5px; }
+      .numbers-container img:nth-child(4) { top: 8px; }
+      .numbers-container img:nth-child(5) { top: -5px; }
+    }
+  </style>
 </head>
 <body>
 
-<!-- Centered Title + Buttons -->
-<div class="main-center">
+  <div class="main-center">
     <h1>Henrik's Firewood Pizza</h1>
     <div class="est">Est. 2025</div>
     <div class="button-container">
-        <a href="order.html">Order a Pizza</a>
-        <a href="review.html">View Reviews</a>
+      <a id="order-link" href="menuorder.html">Order a Pizza</a>
+      <a href="review.html">View Reviews</a>
     </div>
-    <div class="info-text">Freshly made – Firewood baked – Delicious every time</div>
-</div>
 
-<!-- Floating Pizzas -->
-<img src="assets/pizzaimages/pizza1.png" class="pizza" style="top: 10%; left: 20%; animation-duration: 12s;">
-<img src="assets/pizzaimages/pizza2.png" class="pizza" style="top: 50%; left: 70%; animation-duration: 9s;">
-<img src="assets/pizzaimages/pizza3.png" class="pizza" style="top: 30%; left: 40%; animation-duration: 11s;">
-<img src="assets/pizzaimages/pizza4.png" class="pizza" style="top: 70%; left: 10%; animation-duration: 14s;">
+    <div class="numbers-container">
+      <img src="assets/images/numbers/1.png" alt="1">
+      <img src="assets/images/numbers/2.png" alt="2">
+      <img src="assets/images/numbers/3.png" alt="3">
+      <img src="assets/images/numbers/4.png" alt="4">
+      <img src="assets/images/numbers/5.png" alt="5">
+    </div>
 
-<!-- Admin code input -->
-<input type="text" id="adminCode" placeholder="Enter admin code">
+    <div class="info-text" id="status-text">Loading status...</div>
 
-<script>
-// Admin code redirect
-const adminInput = document.getElementById('adminCode');
-adminInput.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') {
-        if (adminInput.value === 'Admin123') {
-            window.location.href = 'admin.html';
+    <button id="adminToggle">Toggle Open/Closed</button>
+  </div>
+
+  <input type="text" id="adminCode" placeholder="Enter admin code">
+
+  <!-- Firebase CDN -->
+  <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyCE4Oi295CdHwl1o-GbZwSuLZN6TlbZsw4",
+      authDomain: "henrikpizza-46595.firebaseapp.com",
+      projectId: "henrikpizza-46595",
+      storageBucket: "henrikpizza-46595.appspot.com",
+      messagingSenderId: "590622406769",
+      appId: "1:590622406769:web:8a0a196ba5820eedb683d0"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const orderLink = document.getElementById("order-link");
+    const statusText = document.getElementById("status-text");
+    const adminCodeInput = document.getElementById("adminCode");
+    const adminToggleBtn = document.getElementById("adminToggle");
+
+    const statusDocRef = db.collection("settings").doc("restaurantStatus");
+
+    // Listen to restaurant status
+    statusDocRef.onSnapshot((docSnap) => {
+      if(docSnap.exists){
+        const isOpen = docSnap.data().open === true;
+        statusText.textContent = isOpen 
+          ? "We are open — Freshly made, firewood baked, delicious every time!" 
+          : "Sorry, we are currently closed. Please check back later.";
+        orderLink.style.pointerEvents = isOpen ? "auto" : "none";
+        orderLink.style.opacity = isOpen ? "1" : "0.5";
+        adminToggleBtn.textContent = isOpen ? "Set Closed" : "Set Open";
+      }
+    });
+
+    // Admin code check
+    adminCodeInput.addEventListener('keydown', function(e){
+      if(e.key === 'Enter'){
+        if(adminCodeInput.value === 'Admin123'){
+          adminToggleBtn.style.display = 'inline-block';
+          adminCodeInput.value = '';
+          alert("Admin mode activated. You can toggle open/closed now.");
         } else {
-            alert('Incorrect code');
-            adminInput.value = '';
+          alert('Incorrect code');
+          adminCodeInput.value = '';
         }
-    }
-});
-</script>
+      }
+    });
 
+    // Toggle restaurant status
+    adminToggleBtn.addEventListener('click', function(){
+      statusDocRef.get().then(docSnap => {
+        if(docSnap.exists){
+          const isOpen = docSnap.data().open === true;
+          statusDocRef.update({ open: !isOpen })
+            .then(() => console.log('Status updated!'))
+            .catch(err => console.error('Error updating status:', err));
+        }
+      });
+    });
+  </script>
 </body>
 </html>

@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Menu - Henrik's Firewood Pizza</title>
+
+<!-- Google Font: Cinzel -->
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+
+<!-- Boxicons CDN -->
+<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
+<style>
+html, body { margin: 0; height: 100%; }
+body {
+    background-color: #fef5e6;
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    color: rgb(36,36,36);
+    position: relative;
+}
+
+/* Basket button */
+.basket-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background-color: #4CAF50; 
+    color: white;
+    border: none;
+    border-radius: 50px; 
+    display: flex;
+    align-items: center;
+    padding: 8px 16px;
+    font-weight: bold;
+    cursor: pointer;
+    gap: 10px;
+    z-index: 10;
+}
+.basket-btn i { font-size: 1.2rem; }
+.basket-text { flex-grow: 1; text-align: center; }
+.basket-amount { text-align: right; }
+.basket-count {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: red;
+    color: white;
+    font-size: 0.8rem;
+    font-weight: bold;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Menu Header */
+.menu-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 5px;
+}
+.bar { width: 150px; height: 2px; background-color: rgb(36,36,36); }
+.menu-text { font-family: 'Cinzel', serif; font-size: 2rem; text-align: center; }
+
+.veg-note {
+    margin-top: 2px;
+    font-size: 1rem;
+    font-weight: bold;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Arial', sans-serif;
+}
+.veg-symbol { color: green; font-weight: bold; font-size: 1.2rem; vertical-align: middle; }
+
+/* Menu Items Container */
+.menu-items-container {
+    width: 90%;            
+    max-width: 1000px;     
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+}
+
+/* Menu Item Card */
+.menu-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #ffffff;
+    padding: 15px;
+    width: 95%;
+    max-width: 600px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.menu-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.menu-item-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+}
+
+.menu-item-title { font-size: 1.2rem; font-weight: bold; color: #222; font-family: 'Cinzel', serif; }
+.menu-item-description { font-size: 0.9rem; opacity: 0.8; color: #333; }
+
+.menu-item-right { display: flex; align-items: center; gap: 10px; }
+.menu-item-price { font-weight: bold; font-size: 1.1rem; color: #222; }
+.menu-item-add {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #4CAF50;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+.menu-item-add i { color: white; font-size: 1.2rem; }
+
+/* Custom pizza toppings */
+.toppings-container {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.toppings-container label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 600px) {
+    .menu-text { font-size: 1.5rem; }
+    .bar { width: 100px; height: 1.5px; }
+    .veg-note { font-size: 0.9rem; }
+    .veg-symbol { font-size: 1.2rem; }
+
+    .menu-items-container { width: 95%; }
+
+    .basket-btn {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        top: auto;
+        right: auto;
+        padding: 10px 20px;
+        font-size: 1rem;
+        gap: 8px;
+    }
+
+    .menu-item { flex-direction: column; align-items: stretch; }
+    .menu-item-right { justify-content: space-between; margin-top: 10px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Basket button -->
+<button class="basket-btn" onclick="goToBasket()">
+    <i class='bx bx-basket'></i>
+    <span class="basket-text">Basket</span>
+    <span class="basket-amount">£0.00</span>
+    <div class="basket-count" id="basket-count">0</div>
+</button>
+
+<!-- Menu header -->
+<div class="menu-header">
+    <div class="bar"></div>
+    <div class="menu-text">Menu</div>
+    <div class="bar"></div>
+</div>
+
+<!-- Vegetarian note -->
+<div class="veg-note">
+    <span class="veg-symbol">V</span>
+    <span>- Vegetarian</span>
+</div>
+
+<!-- Menu Items Container -->
+<div class="menu-items-container">
+
+    <!-- Margherita -->
+    <div class="menu-item" 
+         data-name="Margherita" 
+         data-price="5" 
+         data-description="Classic pizza with tomato, mozzarella, and fresh basil." 
+         data-veg="true">
+        <div class="menu-item-info">
+            <div class="menu-item-title">Margherita <span class="veg-symbol">V</span></div>
+            <div class="menu-item-description">
+                Classic pizza with tomato, mozzarella, and fresh basil.
+                <span style="text-decoration: line-through; color: #888;">£8.00</span> 
+                <span style="font-weight:bold; color:#222;">£5.00</span>
+            </div>
+        </div>
+        <div class="menu-item-right">
+            <div class="menu-item-price">£5.00</div>
+            <div class="menu-item-add" onclick="addToCart(this)">
+                <i class='bx bx-plus'></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pepperoni -->
+    <div class="menu-item" 
+         data-name="Pepperoni" 
+         data-price="5" 
+         data-description="Tomato sauce, mozzarella, and generous slices of pepperoni." 
+         data-veg="false">
+        <div class="menu-item-info">
+            <div class="menu-item-title">Pepperoni</div>
+            <div class="menu-item-description">
+                Tomato sauce, mozzarella, and generous slices of pepperoni.
+                <span style="text-decoration: line-through; color: #888;">£8.00</span> 
+                <span style="font-weight:bold; color:#222;">£5.00</span>
+            </div>
+        </div>
+        <div class="menu-item-right">
+            <div class="menu-item-price">£5.00</div>
+            <div class="menu-item-add" onclick="addToCart(this)">
+                <i class='bx bx-plus'></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Henrik's Pizza -->
+    <div class="menu-item" 
+         data-name="Henrik's Pizza" 
+         data-price="5" 
+         data-description="Tomato sauce, mozzarella, pepperoni, chorizo, fresh buffalo mozzarella, and Parmesan cheese on top." 
+         data-veg="false">
+        <div class="menu-item-info">
+            <div class="menu-item-title">Henrik's Pizza</div>
+            <div class="menu-item-description">
+                Tomato sauce, mozzarella, pepperoni, chorizo, fresh buffalo mozzarella, and Parmesan cheese on top.
+                <span style="text-decoration: line-through; color: #888;">£8.00</span> 
+                <span style="font-weight:bold; color:#222;">£5.00</span>
+            </div>
+        </div>
+        <div class="menu-item-right">
+            <div class="menu-item-price">£5.00</div>
+            <div class="menu-item-add" onclick="addToCart(this)">
+                <i class='bx bx-plus'></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Pizza -->
+    <div class="menu-item" 
+         data-name="Custom Pizza" 
+         data-price="5" 
+         data-description="Build your own pizza by selecting toppings!" 
+         data-veg="false">
+        <div class="menu-item-info">
+            <div class="menu-item-title">Custom Pizza</div>
+            <div class="menu-item-description">
+                Build your own pizza by selecting toppings.
+                <span style="text-decoration: line-through; color: #888;">£8.00</span> 
+                <span style="font-weight:bold; color:#222;">£5.00</span>
+            </div>
+            <div class="toppings-container">
+                <label><input type="checkbox" value="Cheese"> Cheese</label>
+                <label><input type="checkbox" value="Tomato Sauce"> Sauce</label>
+                <label><input type="checkbox" value="Pepperoni"> Pepperoni</label>
+                <label><input type="checkbox" value="Ham"> Ham</label>
+                <label><input type="checkbox" value="Chorizo"> Chorizo</label>
+                <label><input type="checkbox" value="Chicken"> Chicken</label>
+                <label><input type="checkbox" value="Mushrooms"> Mushrooms</label>
+                <label><input type="checkbox" value="Jalapenos"> Jalapenos</label>
+                <label><input type="checkbox" value="Olives"> Olives</label>
+            </div>
+        </div>
+        <div class="menu-item-right">
+            <div class="menu-item-price">£5.00</div>
+            <div class="menu-item-add" onclick="addCustomToCart(this)">
+                <i class='bx bx-plus'></i>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+let cart = [];
+let total = 0;
+let itemCount = 0;
+
+function addToCart(button) {
+    const itemDiv = button.closest('.menu-item');
+    const name = itemDiv.dataset.name;
+    const price = parseFloat(itemDiv.dataset.price);
+    const description = itemDiv.dataset.description;
+    const veg = itemDiv.dataset.veg === 'true';
+
+    cart.push({name, price, description, veg});
+    total += price;
+    itemCount += 1;
+
+    document.querySelector('.basket-amount').textContent = `£${total.toFixed(2)}`;
+    document.getElementById('basket-count').textContent = itemCount;
+}
+
+function addCustomToCart(button) {
+    const itemDiv = button.closest('.menu-item');
+    const name = itemDiv.dataset.name;
+    const price = parseFloat(itemDiv.dataset.price);
+    const veg = false;
+    
+    // Gather selected toppings
+    const selectedToppings = Array.from(itemDiv.querySelectorAll('.toppings-container input:checked')).map(cb => cb.value);
+    let description = selectedToppings.length ? 'Custom toppings: ' + selectedToppings.join(', ') : 'Custom pizza with no toppings selected.';
+
+    cart.push({name, price, description, veg});
+    total += price;
+    itemCount += 1;
+
+    document.querySelector('.basket-amount').textContent = `£${total.toFixed(2)}`;
+    document.getElementById('basket-count').textContent = itemCount;
+}
+
+function goToBasket() {
+    localStorage.setItem('cart', JSON.stringify(cart));
+    window.location.href = 'basket.html';
+}
+</script>
+
+</body>
+</html>
