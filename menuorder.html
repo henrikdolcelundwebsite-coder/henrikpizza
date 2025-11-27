@@ -204,7 +204,7 @@ body {
     <!-- Margherita -->
     <div class="menu-item" 
          data-name="Margherita" 
-         data-price="5" 
+         data-price="6" 
          data-description="Classic pizza with tomato, mozzarella, and fresh basil." 
          data-veg="true">
         <div class="menu-item-info">
@@ -212,11 +212,11 @@ body {
             <div class="menu-item-description">
                 Classic pizza with tomato, mozzarella, and fresh basil.
                 <span style="text-decoration: line-through; color: #888;">£8.00</span> 
-                <span style="font-weight:bold; color:#222;">£5.00</span>
+                <span style="font-weight:bold; color:#222;">£6.00</span>
             </div>
         </div>
         <div class="menu-item-right">
-            <div class="menu-item-price">£5.00</div>
+            <div class="menu-item-price">£6.00</div>
             <div class="menu-item-add" onclick="addToCart(this)">
                 <i class='bx bx-plus'></i>
             </div>
@@ -226,7 +226,7 @@ body {
     <!-- Pepperoni -->
     <div class="menu-item" 
          data-name="Pepperoni" 
-         data-price="5" 
+         data-price="6" 
          data-description="Tomato sauce, mozzarella, and generous slices of pepperoni." 
          data-veg="false">
         <div class="menu-item-info">
@@ -234,11 +234,11 @@ body {
             <div class="menu-item-description">
                 Tomato sauce, mozzarella, and generous slices of pepperoni.
                 <span style="text-decoration: line-through; color: #888;">£8.00</span> 
-                <span style="font-weight:bold; color:#222;">£5.00</span>
+                <span style="font-weight:bold; color:#222;">£6.00</span>
             </div>
         </div>
         <div class="menu-item-right">
-            <div class="menu-item-price">£5.00</div>
+            <div class="menu-item-price">£6.00</div>
             <div class="menu-item-add" onclick="addToCart(this)">
                 <i class='bx bx-plus'></i>
             </div>
@@ -248,7 +248,7 @@ body {
     <!-- Henrik's Pizza -->
     <div class="menu-item" 
          data-name="Henrik's Pizza" 
-         data-price="5" 
+         data-price="6" 
          data-description="Tomato sauce, mozzarella, pepperoni, chorizo, fresh buffalo mozzarella, and Parmesan cheese on top." 
          data-veg="false">
         <div class="menu-item-info">
@@ -256,11 +256,11 @@ body {
             <div class="menu-item-description">
                 Tomato sauce, mozzarella, pepperoni, chorizo, fresh buffalo mozzarella, and Parmesan cheese on top.
                 <span style="text-decoration: line-through; color: #888;">£8.00</span> 
-                <span style="font-weight:bold; color:#222;">£5.00</span>
+                <span style="font-weight:bold; color:#222;">£6.00</span>
             </div>
         </div>
         <div class="menu-item-right">
-            <div class="menu-item-price">£5.00</div>
+            <div class="menu-item-price">£6.00</div>
             <div class="menu-item-add" onclick="addToCart(this)">
                 <i class='bx bx-plus'></i>
             </div>
@@ -270,7 +270,7 @@ body {
     <!-- Custom Pizza -->
     <div class="menu-item" 
          data-name="Custom Pizza" 
-         data-price="5" 
+         data-price="6" 
          data-description="Build your own pizza by selecting toppings!" 
          data-veg="false">
         <div class="menu-item-info">
@@ -278,7 +278,7 @@ body {
             <div class="menu-item-description">
                 Build your own pizza by selecting toppings.
                 <span style="text-decoration: line-through; color: #888;">£8.00</span> 
-                <span style="font-weight:bold; color:#222;">£5.00</span>
+                <span style="font-weight:bold; color:#222;">£6.00</span>
             </div>
             <div class="toppings-container">
                 <label><input type="checkbox" value="Cheese"> Cheese</label>
@@ -300,7 +300,7 @@ body {
             </div>
         </div>
         <div class="menu-item-right">
-            <div class="menu-item-price">£5.00</div>
+            <div class="menu-item-price">£6.00</div>
             <div class="menu-item-add" onclick="addCustomToCart(this)">
                 <i class='bx bx-plus'></i>
             </div>
@@ -335,9 +335,8 @@ function addCustomToCart(button) {
     const price = parseFloat(itemDiv.dataset.price);
     const veg = false;
     
-    // Gather selected toppings
     const selectedToppings = Array.from(itemDiv.querySelectorAll('.toppings-container input:checked')).map(cb => cb.value);
-    let description = selectedToppings.length ? 'Custom toppings: ' + selectedToppings.join(', ') : 'Custom pizza with no toppings selected.';
+    const description = selectedToppings.length ? 'Custom toppings: ' + selectedToppings.join(', ') : 'Custom pizza with no toppings selected.';
 
     cart.push({name, price, description, veg, toppings: selectedToppings});
     total += price;

@@ -144,14 +144,19 @@ function setupPayPal() {
         style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'pay' },
         createOrder: (data, actions) => {
             if(cart.length === 0) { alert("Cart is empty!"); return; }
+
+            const customerName = document.getElementById('customerName').value.trim();
+            if(customerName === '') { alert("Please enter your name before proceeding."); return; }
+
             const orderType = orderTypeEl.value;
-            const deliveryAddress = document.getElementById('deliveryAddress').value.trim();
-            if(orderType==='delivery' && !deliveryAddress.includes('Sandy Lane')){
-                alert("We only deliver to Sandy Lane."); return;
+            if(orderType !== 'delivery' && orderType !== 'pickup') { alert("Please select pickup or delivery."); return; }
+
+            if(orderType==='delivery') {
+                const deliveryAddress = document.getElementById('deliveryAddress').value.trim();
+                if(!deliveryAddress.includes('Sandy Lane')) { alert("We only deliver to Sandy Lane."); return; }
             }
-            return actions.order.create({
-                purchase_units: [{ amount: { value: total.toFixed(2) } }]
-            });
+
+            return actions.order.create({ purchase_units: [{ amount: { value: total.toFixed(2) } }] });
         },
         onApprove: async (data, actions) => {
             await actions.order.capture();
@@ -168,7 +173,6 @@ function setupPayPal() {
             const orderKey = orderNumber.toString().padStart(4,'0');
             const formattedOrderNumber = '#' + orderKey;
 
-            // Prepare cart data with descriptions
             const cartData = cart.map(item => ({
                 name: item.name,
                 price: item.price,
@@ -177,7 +181,6 @@ function setupPayPal() {
                 description: item.description
             }));
 
-            // Create order data
             const orderData = {
                 orderNumber: formattedOrderNumber,
                 name,
