@@ -50,39 +50,66 @@ header h1 {
     gap: 15px;
 }
 
+/* REVIEW CARDS */
 .review-card {
     background: white;
     padding: 20px;
     border-radius: 12px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    border: 2px solid rgb(36,36,36); /* dark gray border */
+    border: 2px solid rgb(36,36,36);
     transition: border-color 0.3s;
 }
 
-.review-card:hover {
-    border-color: #555; /* slightly lighter on hover */
+.review-card:hover { border-color: #555; }
+
+.review-card h3 { margin: 0 0 5px 0; font-size: 1.2rem; }
+.review-card .stars { color: #ffb400; margin-bottom: 10px; }
+.review-card .message { font-size: 1rem; margin-bottom: 8px; }
+.review-card .timestamp { font-size: 0.85rem; color: #555; text-align: right; }
+
+/* ADD REVIEW FORM */
+#reviewForm {
+    margin-top: 40px;
+    width: 100%;
+    max-width: 600px;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    border: 2px solid rgb(36,36,36);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 
-.review-card h3 {
-    margin: 0 0 5px 0;
-    font-size: 1.2rem;
+#reviewForm h2 {
+    margin-top: 0;
+    font-size: 1.5rem;
 }
 
-.review-card .stars {
-    color: #ffb400;
-    margin-bottom: 10px;
+#reviewForm input,
+#reviewForm textarea,
+#reviewForm select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 8px;
+    margin-bottom: 15px;
+    font-family: inherit;
+    border-radius: 8px;
+    border: 1px solid #aaa;
 }
 
-.review-card .message {
-    font-size: 1rem;
-    margin-bottom: 8px;
+#submitBtn {
+    width: 100%;
+    padding: 12px;
+    background: rgb(36,36,36);
+    color: white;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.3s;
 }
 
-.review-card .timestamp {
-    font-size: 0.85rem;
-    color: #555;
-    text-align: right;
-}
+#submitBtn:hover { background: #555; }
 
 @media (max-width: 500px) {
     header h1 { font-size: 2rem; }
@@ -98,13 +125,33 @@ header h1 {
     <a id="backHome" href="index.html">Back to Home</a>
 </header>
 
-<div class="review-list" id="reviewList">
-    <!-- Reviews will be appended here -->
+<div class="review-list" id="reviewList"></div>
+
+<!-- ⭐ ADD REVIEW FORM -->
+<div id="reviewForm">
+    <h2>Leave a Review</h2>
+
+    <label>Name</label>
+    <input type="text" id="nameInput" placeholder="Your name" required>
+
+    <label>Rating</label>
+    <select id="starInput">
+        <option value="5">★★★★★ (5)</option>
+        <option value="4">★★★★☆ (4)</option>
+        <option value="3">★★★☆☆ (3)</option>
+        <option value="2">★★☆☆☆ (2)</option>
+        <option value="1">★☆☆☆☆ (1)</option>
+    </select>
+
+    <label>Review</label>
+    <textarea id="reviewInput" rows="4" placeholder="Write your review..." required></textarea>
+
+    <button id="submitBtn">Submit Review</button>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { getFirestore, collection, getDocs, query, orderBy, addDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyCE4Oi295CdHwl1o-GbZwSuLZN6TlbZsw4",
@@ -126,15 +173,10 @@ async function loadReviews() {
     const q = query(reviewsCol, orderBy("timestamp", "desc"));
     const snapshot = await getDocs(q);
 
-    reviewList.innerHTML = ""; // Clear any existing content
+    reviewList.innerHTML = "";
 
     if (snapshot.empty) {
-        const noReviews = document.createElement("div");
-        noReviews.style.textAlign = "center";
-        noReviews.style.fontSize = "1.1rem";
-        noReviews.style.marginTop = "20px";
-        noReviews.textContent = "There are no reviews yet. Order a pizza to leave one!";
-        reviewList.appendChild(noReviews);
+        reviewList.innerHTML = "<div style='text-align:center;margin-top:20px;font-size:1.1rem;'>There are no reviews yet. Order a pizza to leave one!</div>";
         return;
     }
 
@@ -143,33 +185,45 @@ async function loadReviews() {
         const card = document.createElement("div");
         card.className = "review-card";
 
-        const name = document.createElement("h3");
-        name.textContent = data.name;
-
-        const stars = document.createElement("div");
-        stars.className = "stars";
-        stars.textContent = "★".repeat(data.stars) + "☆".repeat(5 - data.stars);
-
-        const message = document.createElement("div");
-        message.className = "message";
-        message.textContent = data.review;
-
-        const timestamp = document.createElement("div");
-        timestamp.className = "timestamp";
-        const date = new Date(data.timestamp);
-        timestamp.textContent = date.toLocaleString();
-
-        card.appendChild(name);
-        card.appendChild(stars);
-        card.appendChild(message);
-        card.appendChild(timestamp);
+        card.innerHTML = `
+            <h3>${data.name}</h3>
+            <div class="stars">${"★".repeat(data.stars)}${"☆".repeat(5 - data.stars)}</div>
+            <div class="message">${data.review}</div>
+            <div class="timestamp">${new Date(data.timestamp).toLocaleString()}</div>
+        `;
 
         reviewList.appendChild(card);
     });
 }
 
-
 loadReviews();
+
+/* ⭐ SUBMIT NEW REVIEW */
+document.getElementById("submitBtn").addEventListener("click", async () => {
+    const name = document.getElementById("nameInput").value.trim();
+    const stars = parseInt(document.getElementById("starInput").value);
+    const review = document.getElementById("reviewInput").value.trim();
+
+    if (!name || !review) {
+        alert("Please fill out all fields.");
+        return;
+    }
+
+    await addDoc(collection(firestore, "reviews"), {
+        name,
+        stars,
+        review,
+        timestamp: Date.now()
+    });
+
+    alert("Thank you! Your review has been submitted.");
+
+    document.getElementById("nameInput").value = "";
+    document.getElementById("reviewInput").value = "";
+    document.getElementById("starInput").value = "5";
+
+    loadReviews();
+});
 </script>
 
 </body>
