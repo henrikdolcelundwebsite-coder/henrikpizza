@@ -138,7 +138,7 @@
       if(docSnap.exists){
         const isOpen = docSnap.data().open === true;
         statusText.textContent = isOpen 
-          ? "We are open — Freshly made, firewood baked, delicious every time!" 
+          ? "We are open — Delivering or pickup from 5-7pm" 
           : "Sorry, we are currently closed. Please check back later.";
         orderLink.style.pointerEvents = isOpen ? "auto" : "none";
         orderLink.style.opacity = isOpen ? "1" : "0.5";
